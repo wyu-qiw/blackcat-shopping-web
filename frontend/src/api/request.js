@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 // 统一 axios 实例：自动携带 Token、统一处理 Result 返回格式
 const service = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 15000
 })
 
