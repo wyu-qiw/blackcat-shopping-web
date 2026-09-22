@@ -1,0 +1,12 @@
+.idea/
+*.iml
+target/
+node_modules/
+dist/
+uploads/
+*.log
+.DS_Store
+
+
+# 本地备份（含数据库 dump，体积大，不入库）
+backups/

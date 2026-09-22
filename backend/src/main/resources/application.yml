@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shopping_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: wd1234
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+app:
+  jwt:
+    # JWT 签名密钥，生产环境请替换为足够长的随机字符串
+    secret: shopping-platform-jwt-secret-key-2026-spring-boot3-vue3-online-shop
+    expire-hours: 24
+  upload-dir: uploads
+  ai:
+    # AI 能力配置（OpenAI 兼容接口）
+    # 当前已切换为 DeepSeek（base-url: https://api.deepseek.com/v1，model: deepseek-chat）
+    # API Key：填入你自己的 Key，或设置环境变量 YOUR_API_KEY
+    # 未配置时后端可正常启动，调用 AI 接口会返回友好提示
+    base-url: https://api.deepseek.com/v1
+    model: deepseek-chat
+    api-key: ${YOUR_API_KEY:}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.shop: info
+
+
+
+
