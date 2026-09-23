@@ -566,7 +566,6 @@ onMounted(async () => {
     inset: 0;
     z-index: 90;
     background: rgba(15, 23, 42, 0.42);
-    backdrop-filter: blur(2px);
   }
 
   .side,
@@ -579,6 +578,7 @@ onMounted(async () => {
     transform: translateX(-105%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 18px 0 44px -20px rgba(15, 23, 42, 0.45);
+    z-index: 100;
   }
 
   .side.mobile-open { transform: translateX(0); }
