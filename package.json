@@ -4,6 +4,6 @@
   "private": true,
   "description": "黑猫优选 - Spring Boot 3 + Vue 3 线上购物平台（Cloudflare Pages 根构建入口，真正前端在 frontend/）",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && npm install && npm run build -- --outDir ../dist --emptyOutDir"
   }
 }
