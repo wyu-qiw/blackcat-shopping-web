@@ -1,6 +1,6 @@
 const DEFAULT_BACKEND_ORIGIN = 'https://latitude-privileges-ignored-internationally.trycloudflare.com'
 const HOP_BY_HOP_REQUEST_HEADERS = new Set([
-  'host', 'content-length', 'accept-encoding', 'connection', 'keep-alive',
+  'host', 'origin', 'content-length', 'accept-encoding', 'connection', 'keep-alive',
   'proxy-connection', 'transfer-encoding', 'upgrade'
 ])
 const HOP_BY_HOP_RESPONSE_HEADERS = new Set([
@@ -61,3 +61,4 @@ export async function onRequest(context) {
     })
   }
 }
+
