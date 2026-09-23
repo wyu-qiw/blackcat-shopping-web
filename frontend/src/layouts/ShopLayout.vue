@@ -606,6 +606,8 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1001;
   }
 
   .crumb {
@@ -624,3 +626,4 @@ onMounted(async () => {
   }
 }
 </style>
+

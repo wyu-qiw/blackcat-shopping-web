@@ -378,6 +378,10 @@ const panelStyle = computed(() => {
 
 // ===== 生命周期 =====
 onMounted(() => {
+  defaultBallPos()
+  defaultPanelPos()
+  ballPosInit = true
+  panelPosInit = true
   window.addEventListener('resize', onResize)
 })
 onBeforeUnmount(() => {
@@ -590,3 +594,4 @@ onBeforeUnmount(() => {
   .ai-head:not(.no-drag) { touch-action: none; }
 }
 </style>
+
