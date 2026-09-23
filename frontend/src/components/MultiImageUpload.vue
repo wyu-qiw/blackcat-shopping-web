@@ -183,4 +183,26 @@ function remove(index) {
 .upload-box.disabled { opacity: 0.7; }
 .upload-text { font-size: 12px; font-weight: 700; }
 .upload-count { font-size: 11px; color: #8a94a6; }
+
+/* 手机 / 触屏：操作按钮常显，避免 hover 在触屏上不可用 */
+@media (max-width: 640px), (pointer: coarse) {
+  .img-card { border-width: 1.5px; border-radius: 9px; }
+  .img-mask {
+    opacity: 1;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 0 0 7px;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.08) 58%, transparent);
+  }
+  .mask-btn {
+    width: 32px;
+    height: 32px;
+    padding: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 18px;
+  }
+  .mask-btn.danger { background: rgba(239, 68, 68, 0.32); }
+}
 </style>
+

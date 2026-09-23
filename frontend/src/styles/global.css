@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    白蓝色渐变科技风 · 全局样式
    设计关键词：明亮、干净、未来感、可读性
    ========================================================= */
@@ -175,4 +175,512 @@ a {
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+/* =========================================================
+   移动端全局兜底
+   ========================================================= */
+html,
+body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  /* 覆盖 Element Plus 弹窗固定宽度（含写死 width 的弹窗） */
+  .el-overlay-dialog .el-dialog {
+    width: calc(100vw - 24px) !important;
+    margin: 5vh auto 4vh !important;
+  }
+
+  .el-message {
+    max-width: calc(100vw - 24px);
+  }
+
+  .el-message-box {
+    width: calc(100vw - 32px) !important;
+  }
+}
+
+/* MOBILE PAGE REFINEMENTS v1 */
+
+/* =========================================================
+   移动端页面比例精细优化（≤640px）
+   ========================================================= */
+@media (max-width: 640px) {
+  /* 通用页面标题区 */
+  .section-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .section-head h2 {
+    font-size: 20px;
+  }
+
+  .section-head .sub-actions,
+  .section-head .el-button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  /* 登录 / 注册 */
+  .auth-page {
+    padding: 14px !important;
+  }
+
+  body .auth-page .auth-card {
+    padding: 24px 18px 20px;
+    border-radius: 16px;
+  }
+
+  .auth-head {
+    margin-bottom: 20px;
+  }
+
+  .auth-head h1 {
+    font-size: 21px;
+  }
+
+  /* 首页 */
+  body .home-page .hero {
+    padding: 68px 10px 18px;
+  }
+
+  body .home-page .glass {
+    width: 100%;
+    min-height: auto;
+    padding: 22px 15px 18px;
+    border-radius: 20px;
+  }
+
+  body .home-page .glass-title {
+    font-size: 32px;
+  }
+
+  body .home-page .glass-sub {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  body .home-page .feature-grid {
+    gap: 10px;
+    margin: 16px 0 20px;
+  }
+
+  body .home-page .feature-card {
+    padding: 12px 10px;
+    gap: 9px;
+  }
+
+  body .home-page .feature-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  body .home-page .buy-btn {
+    padding: 13px 18px;
+    font-size: 15px;
+  }
+
+  /* 商品列表 */
+  body .buy-page .buy-head {
+    gap: 10px;
+  }
+
+  body .buy-page .buy-head h2 {
+    font-size: 22px;
+  }
+
+  body .buy-page .head-actions {
+    width: 100%;
+  }
+
+  body .buy-page .head-actions .el-button {
+    flex: 1;
+    margin-left: 0;
+  }
+
+  body .buy-page .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  body .buy-page .batch-tip {
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  body .buy-page .mini-cart {
+    inset: auto 12px 12px 12px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+  }
+
+  body .buy-page .mini-body {
+    max-height: min(38dvh, 260px);
+  }
+
+  body .buy-page .mini-total {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  body .buy-page .mini-sum {
+    margin-left: auto;
+    font-size: 20px;
+  }
+
+  /* 商品卡片 */
+  body .product-card.tech-card .cover-wrap {
+    height: 142px;
+  }
+
+  body .product-card.tech-card .card-body {
+    padding: 10px 11px 12px;
+  }
+
+  body .product-card.tech-card .card-title {
+    height: 40px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  body .product-card.tech-card .card-meta {
+    margin: 6px 0 8px;
+  }
+
+  body .product-card.tech-card .seller {
+    font-size: 12px;
+  }
+
+  body .product-card.tech-card .price {
+    font-size: 17px;
+  }
+
+  body .product-card.tech-card .view-btn {
+    font-size: 12px;
+  }
+
+  /* 商品详情 */
+  body .detail-page .detail-box {
+    padding: 12px;
+    gap: 14px;
+  }
+
+  body .detail-page .image-panel {
+    height: 230px !important;
+  }
+
+  body .detail-page .info-title {
+    font-size: 19px;
+  }
+
+  body .detail-page .price-box {
+    padding: 10px 12px;
+  }
+
+  body .detail-page .price {
+    font-size: 24px;
+  }
+
+  body .detail-page .buy-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  body .detail-page .buy-zone .el-button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  body .detail-page .comment-actions {
+    justify-content: stretch;
+  }
+
+  body .detail-page .comment-actions .el-button {
+    width: 100%;
+  }
+
+  body .detail-page .comment-item {
+    gap: 8px;
+    padding: 11px 0;
+  }
+
+  /* 购物车：桌面网格改为移动卡片 */
+  body .cart-page .head-row {
+    display: none;
+  }
+
+  body .cart-page .item-row {
+    grid-template-columns: 34px minmax(0, 1fr) 72px;
+    grid-template-rows: auto auto;
+    gap: 8px 9px;
+    padding: 12px 7px;
+    align-items: center;
+  }
+
+  body .cart-page .check-cell {
+    grid-area: 1 / 1 / 3 / 2;
+    align-self: start;
+    padding-top: 9px;
+  }
+
+  body .cart-page .product-cell {
+    grid-area: 1 / 2;
+    gap: 9px;
+  }
+
+  body .cart-page .thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  body .cart-page .price {
+    grid-area: 1 / 3;
+    font-size: 15px;
+    text-align: right;
+  }
+
+  body .cart-page .col-seller {
+    display: none;
+  }
+
+  body .cart-page .col-status {
+    grid-area: 2 / 2;
+  }
+
+  body .cart-page .col-op {
+    grid-area: 2 / 3;
+    text-align: right;
+  }
+
+  body .cart-page .settle-bar {
+    flex-wrap: wrap;
+    gap: 9px;
+    padding: 10px 8px;
+  }
+
+  body .cart-page .settle-right {
+    width: 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  body .cart-page .total-amount {
+    font-size: 22px;
+  }
+
+  body .cart-page .pay-btn {
+    min-width: 112px;
+  }
+
+  /* 发布商品：横向表单改为上下结构 */
+  body .publish-form .el-form-item__label,
+  body .el-dialog .el-form-item__label {
+    width: auto !important;
+    justify-content: flex-start;
+    padding: 0 0 6px;
+    text-align: left;
+  }
+
+  body .publish-form .el-form-item__content,
+  body .el-dialog .el-form-item__content {
+    margin-left: 0 !important;
+    min-width: 0;
+  }
+
+  body .publish-form .el-input-number,
+  body .publish-form .el-select,
+  body .el-dialog .el-input-number,
+  body .el-dialog .el-select {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  body .publish-form .brand-hint,
+  body .publish-form .img-hint,
+  body .publish-form .ai-desc-tip {
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  body .publish-form .ai-desc-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  /* 多图上传：固定 104px 改为三列自适应 */
+  body .multi-upload {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  body .multi-upload .img-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  body .multi-upload .el-upload,
+  body .multi-upload .upload-box {
+    width: 100%;
+    height: 100%;
+    min-height: 82px;
+  }
+
+  body .multi-upload .upload-text {
+    font-size: 11px;
+  }
+
+  /* 个人中心 */
+  body .profile-page .profile-head {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  body .profile-page .actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body .profile-page .actions .el-button {
+    margin-left: 0;
+  }
+
+  /* 后台数据大盘 */
+  body .dashboard-page .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  body .dashboard-page .stat-card .el-card__body {
+    padding: 12px;
+    gap: 9px;
+  }
+
+  body .dashboard-page .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  body .dashboard-page .stat-value {
+    font-size: 19px;
+  }
+
+  body .dashboard-page .stat-label {
+    font-size: 12px;
+  }
+
+  body .dashboard-page .charts-grid {
+    gap: 12px;
+  }
+
+  body .dashboard-page .chart-head {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  body .dashboard-page .chart-canvas {
+    height: 260px;
+  }
+
+  /* 所有 Element Plus 表格：压缩密度，保留横向滚动查看完整信息 */
+  .el-table {
+    font-size: 12px;
+    --el-table-header-font-size: 12px;
+  }
+
+  .el-table .cell {
+    padding-left: 6px;
+    padding-right: 6px;
+    line-height: 1.4;
+  }
+
+  .el-table .el-button {
+    padding: 4px 3px;
+    margin-left: 0 !important;
+  }
+
+  .el-descriptions__label {
+    width: 92px !important;
+  }
+
+  /* AI 助手：面板在手机上几乎占满屏幕 */
+  .ai-ball {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .ai-panel {
+    left: 12px !important;
+    top: 12px !important;
+    width: calc(100vw - 24px) !important;
+    height: calc(100dvh - 24px) !important;
+  }
+
+  .ai-head {
+    padding: 10px 12px;
+  }
+
+  .head-hint {
+    display: none;
+  }
+
+  .ai-msgs {
+    padding: 12px;
+  }
+
+  .msg {
+    max-width: 94%;
+  }
+
+  .msg-bubble {
+    padding: 9px 11px;
+    font-size: 13px;
+  }
+
+  .ai-input {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .ai-input .el-button {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  body .buy-page .batch-toggle span,
+  body .buy-page .cart-entry span {
+    display: none;
+  }
+
+  body .dashboard-page .stat-card .el-card__body {
+    padding: 10px 8px;
+    gap: 7px;
+  }
+
+  body .dashboard-page .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  body .dashboard-page .stat-value {
+    font-size: 17px;
+  }
 }

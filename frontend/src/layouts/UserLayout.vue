@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="user-layout">
     <!-- 顶部功能区：黑猫优选标题 + 搜索 + 全部分类 -->
     <header class="top-bar">
@@ -330,5 +330,55 @@ onMounted(loadCategories)
   .cat-btn span { display: none; }
   .brand span { display: none; }
   .nickname { display: none; }
+}
+
+@media (max-width: 640px) {
+  .top-inner {
+    height: auto;
+    min-height: 58px;
+    padding: 10px 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    gap: 6px;
+    font-size: 17px;
+  }
+
+  .brand span {
+    display: inline;
+  }
+
+  .top-search {
+    order: 4;
+    flex-basis: 100%;
+  }
+
+  .top-search :deep(.el-input-group__append) {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cat-btn {
+    padding: 9px 11px;
+  }
+
+  .cat-btn .arrow {
+    display: none;
+  }
+
+  .user-area {
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  .primary-btn {
+    padding: 7px 14px;
+  }
+
+  .main-content {
+    padding: 14px 12px 24px;
+  }
 }
 </style>

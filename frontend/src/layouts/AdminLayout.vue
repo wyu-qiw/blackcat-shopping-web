@@ -1,6 +1,7 @@
 <template>
-  <el-container class="admin-layout">
-    <el-aside width="220px" class="aside">
+  <el-container class="admin-layout" :class="{ 'mobile-menu-open': mobileMenuOpen }">
+    <div v-if="mobileMenuOpen" class="admin-menu-backdrop" @click="mobileMenuOpen = false"></div>
+    <el-aside width="220px" class="aside" :class="{ 'mobile-open': mobileMenuOpen }">
       <div class="admin-brand">
         <el-icon :size="22"><DataAnalysis /></el-icon>
         <span>商城管理后台</span>
@@ -76,10 +77,13 @@
       </el-menu>
     </el-aside>
 
-    <el-container>
+    <el-container class="admin-body">
       <el-header class="admin-header">
         <!-- 左侧：返回按钮 + 页面标题 -->
-        <div class="header-left">
+        <button type="button" class="admin-mobile-menu-btn" aria-label="打开后台菜单" @click="mobileMenuOpen = true">
+            <el-icon :size="20"><Menu /></el-icon>
+          </button>
+          <div class="header-left">
           <button class="header-back" type="button" :title="backTitle" @click="goBack">
             <el-icon :size="16"><ArrowLeft /></el-icon>
             <span>返回</span>
@@ -117,11 +121,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  ArrowLeft, ArrowDown, Collection, DataAnalysis, Goods, List, Menu as MenuIcon,
+  ArrowLeft, ArrowDown, Collection, DataAnalysis, Goods, List, Menu, Menu as MenuIcon,
   Shop, Tickets, User
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
@@ -134,6 +138,8 @@ const store = useUserStore()
 // 左侧菜单中的商品分类 / 品牌（与商城分类同源，后续新增分类会自动同步）
 const categories = ref([])
 const brands = ref([])
+const mobileMenuOpen = ref(false)
+watch(() => route.fullPath, () => { mobileMenuOpen.value = false })
 
 // 商品管理默认展开，便于直接看到三个子板块
 const defaultOpeneds = ref(['product-manage'])
@@ -320,5 +326,73 @@ onMounted(async () => {
   .header-title { font-size: 14px; }
   .header-right { gap: 8px; }
   .header-right .el-button span { display: none; }
+}
+
+/* ===== 移动端：后台侧边栏改为抽屉 ===== */
+@media (max-width: 768px) {
+  .admin-layout {
+    display: block !important;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .admin-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0.44);
+    backdrop-filter: blur(2px);
+  }
+
+  .aside {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: min(82vw, 290px) !important;
+    height: 100dvh !important;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+  }
+
+  .aside.mobile-open {
+    transform: translateX(0);
+  }
+
+  .admin-body {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .admin-header {
+    height: auto !important;
+    min-height: 56px;
+    padding: 8px 10px !important;
+  }
+
+  .admin-mobile-menu-btn {
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid rgba(37, 99, 235, 0.35);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--brand);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-size: 15px;
+  }
+
+  .header-right .el-dropdown .user-trigger span:not(.el-avatar) {
+    display: none;
+  }
+
+  .admin-main {
+    padding: 12px !important;
+  }
 }
 </style>

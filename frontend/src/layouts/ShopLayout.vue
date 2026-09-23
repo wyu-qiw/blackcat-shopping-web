@@ -1,7 +1,8 @@
 <template>
-  <div class="shop-layout" :class="{ expanded }">
+  <div class="shop-layout" :class="{ expanded, 'mobile-menu-open': mobileMenuOpen }">
+    <div v-if="mobileMenuOpen" class="mobile-menu-backdrop" @click="mobileMenuOpen = false"></div>
     <!-- 左侧功能栏：品牌 + 可纵向展开菜单；宽度随展开在 collapsed/expanded 间过渡 -->
-    <aside class="side" :class="{ expanded: expanded }">
+    <aside class="side" :class="{ expanded: expanded, 'mobile-open': mobileMenuOpen }">
       <!-- 品牌 -->
       <router-link to="/" class="brand" :title="'黑猫优选'">
         <img src="/assets/heimao-logo.jpg" alt="黑猫优选" class="brand-logo" />
@@ -145,6 +146,9 @@
     <div class="main">
       <!-- 右上角用户头像 -->
       <header class="topbar">
+        <button type="button" class="mobile-menu-btn" aria-label="打开功能菜单" @click="mobileMenuOpen = true">
+          <el-icon :size="21"><Menu /></el-icon>
+        </button>
         <div class="crumb">{{ route.meta.title || '黑猫优选' }}</div>
         <div class="top-right">
           <template v-if="store.isLogin">
@@ -185,11 +189,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  ArrowDown, DArrowLeft, DArrowRight, Goods, Search, ShoppingCart, Upload, User
+  ArrowDown, DArrowLeft, DArrowRight, Goods, Menu, Search, ShoppingCart, Upload, User
 } from '@element-plus/icons-vue'
 import { useUserStore } from '../stores/user'
 import { useCartStore } from '../stores/cart'
@@ -209,6 +213,7 @@ if (store.isLogin) {
 const expanded = ref(true)
 const openGoods = ref(true)
 const openMe = ref(false)
+const mobileMenuOpen = ref(false)
 const keyword = ref((route.query.q || '').toString())
 const categories = ref([])
 
@@ -299,6 +304,8 @@ function handleCommand(command) {
     router.push(target)
   }
 }
+
+watch(() => route.fullPath, () => { mobileMenuOpen.value = false })
 
 onMounted(async () => {
   ensureGroup(route.path)
@@ -550,11 +557,70 @@ onMounted(async () => {
   padding: 31px 36px 36px 31px;
 }
 
-/* 小屏适配 */
+/* 小屏适配：侧边栏改为抽屉 */
 @media (max-width: 900px) {
-  .side.expanded { width: 210px; }
-  .content { padding: 20px 18px 24px 14px; }
+  .shop-layout { display: block; }
+
+  .mobile-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(15, 23, 42, 0.42);
+    backdrop-filter: blur(2px);
+  }
+
+  .side,
+  .side.expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(82vw, 300px);
+    height: 100dvh;
+    transform: translateX(-105%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 18px 0 44px -20px rgba(15, 23, 42, 0.45);
+  }
+
+  .side.mobile-open { transform: translateX(0); }
+  .collapse-btn { display: none; }
+
+  .main {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    height: 56px;
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .mobile-menu-btn {
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid rgba(37, 99, 235, 0.35);
+    border-radius: 11px;
+    background: #fff;
+    color: var(--brand);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .crumb {
+    font-size: 16px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .nickname { display: none; }
-  .topbar { padding: 0 16px; }
+
+  .content,
+  .shop-layout.expanded .content {
+    padding: 16px 12px 28px;
+  }
 }
 </style>

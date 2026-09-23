@@ -50,7 +50,7 @@
 
         <el-form-item label="商品图片" prop="images">
           <MultiImageUpload v-model="form.images" :max-count="8" />
-          <span class="img-hint">最多 8 张，第一张为封面；鼠标移到图片上可“设为封面”</span>
+          <span class="img-hint">最多 8 张，第一张为封面；点击图片下方按钮可设为封面</span>
         </el-form-item>
 
         <el-form-item label="商品描述" prop="description">

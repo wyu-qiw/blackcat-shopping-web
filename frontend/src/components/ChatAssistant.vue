@@ -7,7 +7,7 @@
       class="ai-ball"
       :class="{ 'is-dragging': ballDrag.isDragging }"
       :style="ballStyle"
-      @mousedown="onBallMouseDown"
+      @pointerdown="onBallPointerDown"
     >
       <img src="/assets/xiaoxin.png" alt="AI 助手" />
     </div>
@@ -27,7 +27,7 @@
         <div
           class="ai-head"
           :class="{ 'no-drag': isMaximized }"
-          @mousedown="onPanelMouseDown"
+          @pointerdown="onPanelPointerDown"
         >
           <img src="/assets/xiaoxin.png" alt="" class="head-avatar" />
           <span class="head-title">小新助手</span>
@@ -131,6 +131,80 @@ function defaultPanelPos() {
   panelPos.top = Math.max(MARGIN, ballPos.top - PANEL_H - 12)
 }
 
+// ===== Pointer Events：同时支持鼠标、触控笔和手机触摸 =====
+function onBallPointerDown(e) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+  const rect = ballRef.value.getBoundingClientRect()
+  ballDrag.isDragging = true
+  ballDrag.moved = false
+  ballDrag.startX = e.clientX
+  ballDrag.startY = e.clientY
+  ballDrag.offsetX = e.clientX - rect.left
+  ballDrag.offsetY = e.clientY - rect.top
+  window.addEventListener('pointermove', onBallPointerMove)
+  window.addEventListener('pointerup', onBallPointerUp)
+  window.addEventListener('pointercancel', onBallPointerUp)
+  e.preventDefault()
+}
+
+function onBallPointerMove(e) {
+  if (!ballDrag.isDragging) return
+  if (Math.abs(e.clientX - ballDrag.startX) > CLICK_THRESHOLD ||
+      Math.abs(e.clientY - ballDrag.startY) > CLICK_THRESHOLD) {
+    ballDrag.moved = true
+  }
+  const nextLeft = e.clientX - ballDrag.offsetX
+  const nextTop = e.clientY - ballDrag.offsetY
+  ballPos.left = Math.max(0, Math.min(nextLeft, window.innerWidth - BALL_SIZE))
+  ballPos.top = Math.max(0, Math.min(nextTop, window.innerHeight - BALL_SIZE))
+}
+
+function onBallPointerUp() {
+  const wasMoved = ballDrag.moved
+  ballDrag.isDragging = false
+  ballDrag.moved = false
+  window.removeEventListener('pointermove', onBallPointerMove)
+  window.removeEventListener('pointerup', onBallPointerUp)
+  window.removeEventListener('pointercancel', onBallPointerUp)
+  if (!wasMoved) openPanel()
+}
+
+function onPanelPointerDown(e) {
+  if (isMaximized.value) return
+  if (e.target.closest('.head-actions')) return
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+  const rect = panelRef.value.getBoundingClientRect()
+  panelDrag.isDragging = true
+  panelDrag.moved = false
+  panelDrag.startX = e.clientX
+  panelDrag.startY = e.clientY
+  panelDrag.offsetX = e.clientX - rect.left
+  panelDrag.offsetY = e.clientY - rect.top
+  window.addEventListener('pointermove', onPanelPointerMove)
+  window.addEventListener('pointerup', onPanelPointerUp)
+  window.addEventListener('pointercancel', onPanelPointerUp)
+  e.preventDefault()
+}
+
+function onPanelPointerMove(e) {
+  if (!panelDrag.isDragging || isMaximized.value) return
+  if (Math.abs(e.clientX - panelDrag.startX) > CLICK_THRESHOLD ||
+      Math.abs(e.clientY - panelDrag.startY) > CLICK_THRESHOLD) {
+    panelDrag.moved = true
+  }
+  const nextLeft = e.clientX - panelDrag.offsetX
+  const nextTop = e.clientY - panelDrag.offsetY
+  panelPos.left = Math.max(MARGIN, Math.min(nextLeft, window.innerWidth - PANEL_W - MARGIN))
+  panelPos.top = Math.max(MARGIN, Math.min(nextTop, window.innerHeight - PANEL_H - MARGIN))
+}
+
+function onPanelPointerUp() {
+  panelDrag.isDragging = false
+  panelDrag.moved = false
+  window.removeEventListener('pointermove', onPanelPointerMove)
+  window.removeEventListener('pointerup', onPanelPointerUp)
+  window.removeEventListener('pointercancel', onPanelPointerUp)
+}
 // ===== 球的：mousedown / mousemove / mouseup =====
 function onBallMouseDown(e) {
   // 仅响应左键
@@ -510,5 +584,9 @@ onBeforeUnmount(() => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(10px) scale(0.98);
+}
+@media (pointer: coarse) {
+  .ai-ball,
+  .ai-head:not(.no-drag) { touch-action: none; }
 }
 </style>
