@@ -1,7 +1,7 @@
 <template>
   <el-container class="admin-layout" :class="{ 'mobile-menu-open': mobileMenuOpen }">
     <div v-if="mobileMenuOpen" class="admin-menu-backdrop" @click="mobileMenuOpen = false"></div>
-    <el-aside width="220px" class="aside" :class="{ 'mobile-open': mobileMenuOpen }">
+    <el-aside :width="asideWidth" class="aside" :class="{ 'mobile-open': mobileMenuOpen, 'desktop-collapsed': desktopMenuCollapsed }">
       <div class="admin-brand">
         <el-icon :size="22"><DataAnalysis /></el-icon>
         <span>商城管理后台</span>
@@ -11,6 +11,7 @@
         :default-openeds="defaultOpeneds"
         router
         class="admin-menu"
+        :collapse="desktopMenuCollapsed"
         background-color="#ffffff"
         text-color="#4b5563"
         active-text-color="#1f4e79"
@@ -80,7 +81,7 @@
     <el-container class="admin-body">
       <el-header class="admin-header">
         <!-- 左侧：返回按钮 + 页面标题 -->
-        <button type="button" class="admin-mobile-menu-btn" aria-label="打开后台菜单" @click="mobileMenuOpen = true">
+        <button type="button" class="admin-mobile-menu-btn" aria-label="打开后台菜单" @click="toggleAdminMenu">
             <el-icon :size="20"><Menu /></el-icon>
           </button>
           <div class="header-left">
@@ -121,7 +122,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -139,6 +140,30 @@ const store = useUserStore()
 const categories = ref([])
 const brands = ref([])
 const mobileMenuOpen = ref(false)
+const desktopMenuCollapsed = ref(false)
+
+const asideWidth = computed(() => desktopMenuCollapsed.value ? '64px' : '220px')
+
+function isMobileViewport() {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+}
+
+function toggleAdminMenu() {
+  if (isMobileViewport()) {
+    desktopMenuCollapsed.value = false
+    mobileMenuOpen.value = true
+    return
+  }
+  desktopMenuCollapsed.value = !desktopMenuCollapsed.value
+}
+
+function handleViewportChange() {
+  if (isMobileViewport()) {
+    desktopMenuCollapsed.value = false
+  } else {
+    mobileMenuOpen.value = false
+  }
+}
 watch(() => route.fullPath, () => { mobileMenuOpen.value = false })
 
 // 商品管理默认展开，便于直接看到三个子板块
@@ -182,6 +207,8 @@ function handleCommand(command) {
   }
 }
 
+window.addEventListener('resize', handleViewportChange)
+
 onMounted(async () => {
   try {
     const [catList, brandList] = await Promise.all([
@@ -193,6 +220,10 @@ onMounted(async () => {
   } catch {
     // 请求失败已由请求层提示
   }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleViewportChange)
 })
 </script>
 
@@ -225,6 +256,33 @@ onMounted(async () => {
 .admin-menu {
   border-right: none;
   flex: 1;
+}
+
+.aside {
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aside.desktop-collapsed .admin-brand {
+  padding: 0;
+  justify-content: center;
+}
+
+.aside.desktop-collapsed .admin-brand span {
+  display: none;
+}
+
+.admin-mobile-menu-btn {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid rgba(37, 99, 235, 0.35);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 /* 三级菜单项前的小圆点：分类为蓝色，品牌为紫色 */
@@ -396,3 +454,4 @@ onMounted(async () => {
   }
 }
 </style>
+

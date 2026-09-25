@@ -146,7 +146,7 @@
     <div class="main">
       <!-- 右上角用户头像 -->
       <header class="topbar">
-        <button type="button" class="mobile-menu-btn" aria-label="打开功能菜单" @click="mobileMenuOpen = true">
+        <button type="button" class="mobile-menu-btn" aria-label="打开功能菜单" @click="openMobileMenu">
           <el-icon :size="21"><Menu /></el-icon>
         </button>
         <div class="crumb">{{ route.meta.title || '黑猫优选' }}</div>
@@ -214,6 +214,15 @@ const expanded = ref(true)
 const openGoods = ref(true)
 const openMe = ref(false)
 const mobileMenuOpen = ref(false)
+
+function openMobileMenu() {
+  if (typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches) {
+    mobileMenuOpen.value = true
+    return
+  }
+  // 电脑端：三横线按钮用于展开/收起左侧菜单
+  expanded.value = !expanded.value
+}
 const keyword = ref((route.query.q || '').toString())
 const categories = ref([])
 
@@ -389,6 +398,20 @@ onMounted(async () => {
 .side-search {
   padding: 14px 16px 6px;
   flex-shrink: 0;
+}
+
+.mobile-menu-btn {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid rgba(37, 99, 235, 0.35);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--brand);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .menu {
