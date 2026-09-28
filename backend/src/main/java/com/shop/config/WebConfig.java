@@ -10,17 +10,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.nio.file.Path;
 
 /**
- * Web 配置：跨域、权限拦截器、本地图片静态资源映射
+ * Web 配置：跨域、权限拦截器、上传图片与前端构建产物静态资源映射。
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
     private final UploadPathProvider uploadPathProvider;
+    private final FrontendDistProvider frontendDistProvider;
 
-    public WebConfig(AuthInterceptor authInterceptor, UploadPathProvider uploadPathProvider) {
+    public WebConfig(AuthInterceptor authInterceptor,
+                     UploadPathProvider uploadPathProvider,
+                     FrontendDistProvider frontendDistProvider) {
         this.authInterceptor = authInterceptor;
         this.uploadPathProvider = uploadPathProvider;
+        this.frontendDistProvider = frontendDistProvider;
     }
 
     @Override
@@ -40,11 +44,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path dir = uploadPathProvider.getUploadDir().toAbsolutePath().normalize();
-        String path = dir.toString().replace("\\", "/");
-        if (!path.endsWith("/")) {
-            path += "/";
+        Path uploadDir = uploadPathProvider.getUploadDir().toAbsolutePath().normalize();
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(uploadDir.toUri().toString());
+
+        if (frontendDistProvider.isAvailable()) {
+            Path distDir = frontendDistProvider.getDistDir();
+            registry.addResourceHandler("/assets/**")
+                    .addResourceLocations(distDir.resolve("assets").toUri().toString());
+            registry.addResourceHandler("/index.html", "/favicon.png")
+                    .addResourceLocations(distDir.toUri().toString());
         }
-        registry.addResourceHandler("/uploads/**").addResourceLocations("file:" + path);
     }
 }

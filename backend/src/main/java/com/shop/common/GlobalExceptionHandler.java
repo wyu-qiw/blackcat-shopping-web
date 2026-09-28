@@ -2,6 +2,7 @@ package com.shop.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.validation.FieldError;
@@ -51,6 +52,15 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBadRequest(Exception e) {
         return Result.error(Result.CODE_BAD_REQUEST, "请求参数格式错误");
+    }
+
+    /**
+     * 请求方法不支持：例如对只有 GET 的接口发送 POST，返回 405 而不是 500
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Result<Void> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return Result.error(405, "请求方法不支持：" + e.getMethod() + "，请检查 Apifox 中的请求方法（GET / POST / PUT / DELETE）");
     }
 
     @ExceptionHandler(Exception.class)
