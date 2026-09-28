@@ -1,4 +1,4 @@
-const DEFAULT_BACKEND_ORIGIN = 'https://pulled-element-deputy-muscle.trycloudflare.com'
+const DEFAULT_BACKEND_ORIGIN = 'https://immigrants-jackie-contribute-investigations.trycloudflare.com'
 const HOP_BY_HOP_RESPONSE_HEADERS = new Set([
   'content-length', 'content-encoding', 'transfer-encoding', 'connection',
   'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailer', 'upgrade'
@@ -30,4 +30,5 @@ export async function onRequest(context) {
     return new Response('Backend service is unavailable', { status: 503 })
   }
 }
+
 
