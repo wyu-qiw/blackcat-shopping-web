@@ -33,9 +33,9 @@
       :http-request="handleUpload"
       class="upload-trigger"
     >
-      <div class="upload-box" :class="{ disabled: uploading }">
+      <div class="upload-box" :class="{ disabled: pendingCount > 0 }">
         <el-icon :size="22"><Plus /></el-icon>
-        <span class="upload-text">{{ uploading ? '上传中…' : '上传图片' }}</span>
+        <span class="upload-text">{{ pendingCount > 0 ? `上传中 ${doneCount}/${totalCount}` : '上传图片' }}</span>
         <span class="upload-count">{{ modelValue.length }}/{{ maxCount }}</span>
       </div>
     </el-upload>
@@ -43,10 +43,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Delete, Plus, Star } from '@element-plus/icons-vue'
 import { uploadFile } from '../api'
+
+const MAX_FILE_SIZE = 20 * 1024 * 1024
 
 const props = defineProps({
   modelValue: {
@@ -60,24 +62,67 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 
-const uploading = ref(false)
+const uploadQueue = ref([])
+const isProcessing = ref(false)
+const batchTotal = ref(0)
+const batchDone = ref(0)
 
-async function handleUpload(options) {
-  if (props.modelValue.length >= props.maxCount) {
-    ElMessage.warning(`最多只能上传${props.maxCount}张图片`)
+const pendingCount = computed(() => uploadQueue.value.length + (isProcessing.value ? 1 : 0))
+const totalCount = computed(() => batchTotal.value)
+const doneCount = computed(() => batchDone.value)
+
+function handleUpload(options) {
+  const file = options.file
+
+  if (!file.type.startsWith('image/')) {
+    ElMessage.error('只能选择图片文件')
+    options.onError?.(new Error('只能选择图片文件'))
     return
   }
-  uploading.value = true
+
+  if (file.size > MAX_FILE_SIZE) {
+    ElMessage.error(`图片 ${file.name} 超过20MB，请压缩后再上传`)
+    options.onError?.(new Error('图片超过20MB'))
+    return
+  }
+
+  if (props.modelValue.length + uploadQueue.value.length + (isProcessing.value ? 1 : 0) >= props.maxCount) {
+    ElMessage.warning(`最多只能上传${props.maxCount}张图片`)
+    options.onError?.(new Error('图片数量超限'))
+    return
+  }
+
+  uploadQueue.value.push({ file, options })
+  batchTotal.value += 1
+  processQueue()
+}
+
+async function processQueue() {
+  if (isProcessing.value || !uploadQueue.value.length) return
+
+  isProcessing.value = true
+  const task = uploadQueue.value.shift()
+
   try {
-    const url = await uploadFile(options.file)
-    // 若短时间内已达上限则不再追加
+    const url = await uploadFile(task.file)
     if (props.modelValue.length < props.maxCount) {
       emit('update:modelValue', [...props.modelValue, url])
+      task.options.onSuccess?.({ url })
+    } else {
+      ElMessage.warning(`最多只能上传${props.maxCount}张图片`)
     }
-  } catch {
-    // 请求层已提示
+  } catch (error) {
+    task.options.onError?.(error)
   } finally {
-    uploading.value = false
+    isProcessing.value = false
+    batchDone.value += 1
+    if (!uploadQueue.value.length) {
+      batchTotal.value = 0
+      batchDone.value = 0
+    }
+    if (uploadQueue.value.length) {
+      processQueue()
+    }
   }
 }
 
@@ -95,7 +140,6 @@ function remove(index) {
   emit('update:modelValue', list)
 }
 </script>
-
 
 <style scoped>
 .multi-upload {
@@ -205,4 +249,3 @@ function remove(index) {
   .mask-btn.danger { background: rgba(239, 68, 68, 0.32); }
 }
 </style>
-

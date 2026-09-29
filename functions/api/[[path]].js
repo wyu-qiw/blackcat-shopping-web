@@ -1,4 +1,4 @@
-const DEFAULT_BACKEND_ORIGIN = 'https://immigrants-jackie-contribute-investigations.trycloudflare.com'
+const DEFAULT_BACKEND_ORIGIN = 'https://cylinder-affiliated-wal-chemical.trycloudflare.com'
 const HOP_BY_HOP_REQUEST_HEADERS = new Set([
   'host', 'origin', 'content-length', 'accept-encoding', 'connection', 'keep-alive',
   'proxy-connection', 'transfer-encoding', 'upgrade'
@@ -61,6 +61,7 @@ export async function onRequest(context) {
     })
   }
 }
+
 
 
 
