@@ -1,4 +1,4 @@
-const DEFAULT_BACKEND_ORIGIN = 'https://cylinder-affiliated-wal-chemical.trycloudflare.com'
+const DEFAULT_BACKEND_ORIGIN = 'https://trace-occurred-api-obligations.trycloudflare.com'
 const HOP_BY_HOP_REQUEST_HEADERS = new Set([
   'host', 'origin', 'content-length', 'accept-encoding', 'connection', 'keep-alive',
   'proxy-connection', 'transfer-encoding', 'upgrade'
