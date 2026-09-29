@@ -1,4 +1,4 @@
-const DEFAULT_BACKEND_ORIGIN = 'https://trace-occurred-api-obligations.trycloudflare.com'
+const DEFAULT_BACKEND_ORIGIN = 'https://cleared-sheets-removal-consistent.trycloudflare.com'
 const HOP_BY_HOP_REQUEST_HEADERS = new Set([
   'host', 'origin', 'content-length', 'accept-encoding', 'connection', 'keep-alive',
   'proxy-connection', 'transfer-encoding', 'upgrade'
