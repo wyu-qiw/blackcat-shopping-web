@@ -16,6 +16,8 @@ spring:
     time-zone: GMT+8
 
 app:
+  # 任意电脑运行后端后，自动在当前电脑打开项目网页；如需关闭可设为 false
+  auto-open-browser: true
   jwt:
     # JWT 签名密钥，生产环境请替换为足够长的随机字符串
     secret: shopping-platform-jwt-secret-key-2026-spring-boot3-vue3-online-shop

@@ -7,158 +7,65 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
- * 本地开发辅助：
- * 在 IDEA 中携带 --app.dev.local-start=true 启动后端时，自动启动 Vite 前端，
- * 并在前端端口就绪后强制打开浏览器。
+ * 在当前运行项目的电脑上自动打开项目网页。
+ * 页面由 Spring Boot 自身托管，因此不依赖 Vite、Node.js 或特定用户的电脑路径。
  */
 @Component
-@ConditionalOnProperty(name = "app.dev.local-start", havingValue = "true")
+@ConditionalOnProperty(name = "app.auto-open-browser", havingValue = "true", matchIfMissing = true)
 public class DevFrontendLauncher {
 
     private static final Logger log = LoggerFactory.getLogger(DevFrontendLauncher.class);
-    private static final int FRONTEND_PORT = 5173;
-    private static final String FRONTEND_URL = "http://localhost:" + FRONTEND_PORT;
-    private static final long FRONTEND_START_TIMEOUT_MS = 60_000L;
 
-    private Process frontendProcess;
+    @org.springframework.beans.factory.annotation.Value("${server.port:8080}")
+    private String configuredPort;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void startFrontend() {
-        if (isPortOpen(FRONTEND_PORT)) {
-            log.info("检测到前端服务已运行，直接打开浏览器：{}", FRONTEND_URL);
-            waitForFrontendThenOpenBrowser();
+    public void openProjectPageAfterStartup() {
+        String projectUrl = resolveProjectUrl();
+        Thread launcherThread = new Thread(() -> openBrowserSafely(projectUrl), "local-project-browser-launcher");
+        launcherThread.setDaemon(true);
+        launcherThread.start();
+    }
+
+    private void openBrowserSafely(String projectUrl) {
+        if (!waitUntilWebServerReady(projectUrl)) {
+            log.warn("未检测到本机网页服务就绪，请手动访问 {}", projectUrl);
             return;
         }
 
-        Path frontendDir = locateFrontendDir();
-
-        try {
-            ProcessBuilder builder = new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "npm.cmd",
-                    "run",
-                    "dev"
-            );
-
-            builder.directory(frontendDir.toFile());
-            builder.redirectErrorStream(true);
-            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-
-            frontendProcess = builder.start();
-            Runtime.getRuntime().addShutdownHook(new Thread(this::stopFrontend));
-
-            log.info("前端启动命令已执行，等待端口 {} 就绪后自动打开浏览器...", FRONTEND_PORT);
-            waitForFrontendThenOpenBrowser();
-        } catch (IOException e) {
-            throw new IllegalStateException("启动前端失败，请检查 Node.js 和 npm 是否正确安装", e);
+        if (!LocalBrowserLauncher.launch(projectUrl)) {
+            log.error("自动打开网页失败，请手动访问 {}", projectUrl);
         }
     }
 
-    private void waitForFrontendThenOpenBrowser() {
-        Thread openerThread = new Thread(() -> {
-            long deadline = System.currentTimeMillis() + FRONTEND_START_TIMEOUT_MS;
+    private String resolveProjectUrl() {
+        return "http://127.0.0.1:" + configuredPort + "/";
+    }
 
-            while (System.currentTimeMillis() < deadline) {
-                if (isPortOpen(FRONTEND_PORT)) {
-                    openBrowser();
-                    return;
-                }
-
+    private boolean waitUntilWebServerReady(String projectUrl) {
+        for (int i = 0; i < 20; i++) {
+            try {
+                HttpURLConnection connection = (HttpURLConnection) new URL(projectUrl).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(500);
+                connection.setReadTimeout(1000);
+                connection.connect();
+                connection.disconnect();
+                return true;
+            } catch (Exception ignored) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    return;
+                    return false;
                 }
             }
-
-            log.warn("前端服务在 {} 毫秒内未启动成功，请手动访问 {}", FRONTEND_START_TIMEOUT_MS, FRONTEND_URL);
-        }, "frontend-browser-launcher");
-
-        openerThread.setDaemon(true);
-        openerThread.start();
-    }
-
-    private void openBrowser() {
-        log.info("正在打开前端页面：{}", FRONTEND_URL);
-
-        try {
-            if (System.getProperty("os.name", "").toLowerCase().contains("win")) {
-                // Windows 下 start 后面的空字符串是窗口标题，不能省略
-                Process process = new ProcessBuilder("cmd.exe", "/c", "start", "", FRONTEND_URL).start();
-                int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    return;
-                }
-                throw new IllegalStateException("Windows start 命令退出码：" + exitCode);
-            }
-
-            if (java.awt.Desktop.isDesktopSupported()
-                    && java.awt.Desktop.getDesktop().isSupported(java.awt.Desktop.Action.BROWSE)) {
-                java.awt.Desktop.getDesktop().browse(URI.create(FRONTEND_URL));
-                return;
-            }
-
-            throw new IllegalStateException("当前系统不支持自动打开浏览器");
-        } catch (Exception e) {
-            log.error("自动打开浏览器失败，请手动访问：{}", FRONTEND_URL, e);
         }
+        return false;
     }
 
-    private Path locateFrontendDir() {
-        Path currentDir = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
-
-        List<Path> candidates = Arrays.asList(
-                currentDir.resolve("frontend"),
-                currentDir.resolve("../frontend").normalize()
-        );
-
-        return candidates.stream()
-                .filter(path -> Files.exists(path.resolve("package.json")))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "未找到 frontend 目录，请检查 IDEA 运行配置中的 Working directory：" + currentDir
-                ));
-    }
-
-    private boolean isPortOpen(int port) {
-        try (Socket socket = new Socket("localhost", port)) {
-            return true;
-        } catch (IOException ignored) {
-            return false;
-        }
-    }
-
-    private void stopFrontend() {
-        if (frontendProcess == null || !frontendProcess.isAlive()) {
-            return;
-        }
-
-        try {
-            long pid = frontendProcess.pid();
-            new ProcessBuilder(
-                    "cmd.exe",
-                    "/c",
-                    "taskkill.exe",
-                    "/PID",
-                    String.valueOf(pid),
-                    "/T",
-                    "/F"
-            ).start().waitFor();
-        } catch (Exception ignored) {
-            frontendProcess.destroy();
-        }
-    }
 }
-
